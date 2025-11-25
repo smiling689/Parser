@@ -1,8 +1,8 @@
 #ifndef CFG_H_INCLUDED
 #define CFG_H_INCLUDED
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 
 #define MAX_NUMBER_OF_SYMB (100)
 #define MAX_NUMBER_OF_PROD (1000)
