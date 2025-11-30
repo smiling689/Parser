@@ -1,0 +1,210 @@
+--- SLR(1) Parser Generator ---
+请输入上下文无关语法 (CFG) 和待分析序列。
+输入格式:
+1. <终结符数量T> <非终结符数量N> <产生式数量P>
+2. T行: 每行一个终结符名称 (例如: ID, PLUS, ...)
+3. N行: 每行一个非终结符名称 (例如: E, T, F, ...)
+4. 1行: 原始开始符号名称 (必须在 N 中定义过, 例如: E)
+5. P行: 每行描述一个产生式:
+   <左侧符号LHS> <右侧符号数量K> [K个右侧符号RHS ...]
+   例如: E 3 E PLUS T
+   例如: F 1 ID
+6. <待分析序列长度K>
+7. K行: 每行一个待分析的终结符 (来自 T)
+---------------------------------
+请输入:
+First sets:
+  S: {ID, PRINT}
+  E: {ID, NAT, (}
+  L: {ID, NAT, (}
+  S_aug: {ID, PRINT}
+Follow sets:
+  S: {;, $}
+  E: {,, ;, ), +, $}
+  L: {,, )}
+  S_aug: {$}
+States (21):
+State 0:
+  S -> . S ; S
+  S -> . ID := E
+  S -> . PRINT ( L )
+  S_aug -> . S
+State 1:
+  S -> ID . := E
+State 2:
+  S -> PRINT . ( L )
+State 3:
+  S -> S . ; S
+  S_aug -> S .
+State 4:
+  S -> ID := . E
+  E -> . ID
+  E -> . NAT
+  E -> . E + E
+  E -> . ( E )
+State 5:
+  S -> PRINT ( . L )
+  E -> . ID
+  E -> . NAT
+  E -> . E + E
+  E -> . ( E )
+  L -> . E
+  L -> . L , E
+State 6:
+  S -> . S ; S
+  S -> S ; . S
+  S -> . ID := E
+  S -> . PRINT ( L )
+State 7:
+  E -> ID .
+State 8:
+  E -> NAT .
+State 9:
+  E -> . ID
+  E -> . NAT
+  E -> . E + E
+  E -> . ( E )
+  E -> ( . E )
+State 10:
+  S -> ID := E .
+  E -> E . + E
+State 11:
+  E -> E . + E
+  L -> E .
+State 12:
+  S -> PRINT ( L . )
+  L -> L . , E
+State 13:
+  S -> S . ; S
+  S -> S ; S .
+State 14:
+  E -> E . + E
+  E -> ( E . )
+State 15:
+  E -> . ID
+  E -> . NAT
+  E -> . E + E
+  E -> E + . E
+  E -> . ( E )
+State 16:
+  E -> . ID
+  E -> . NAT
+  E -> . E + E
+  E -> . ( E )
+  L -> L , . E
+State 17:
+  S -> PRINT ( L ) .
+State 18:
+  E -> ( E ) .
+State 19:
+  E -> E . + E
+  E -> E + E .
+State 20:
+  E -> E . + E
+  L -> L , E .
+Parse table (shift/reduce entries shown for terminals):
+State 0:
+  on ID -> shift 1
+  on PRINT -> shift 2
+State 1:
+  on := -> shift 4
+State 2:
+  on ( -> shift 5
+State 3:
+  on ; -> shift 6
+  on $ -> reduce S_aug -> S
+State 4:
+  on ID -> shift 7
+  on NAT -> shift 8
+  on ( -> shift 9
+State 5:
+  on ID -> shift 7
+  on NAT -> shift 8
+  on ( -> shift 9
+State 6:
+  on ID -> shift 1
+  on PRINT -> shift 2
+State 7:
+  on , -> reduce E -> ID
+  on ; -> reduce E -> ID
+  on ) -> reduce E -> ID
+  on + -> reduce E -> ID
+  on $ -> reduce E -> ID
+State 8:
+  on , -> reduce E -> NAT
+  on ; -> reduce E -> NAT
+  on ) -> reduce E -> NAT
+  on + -> reduce E -> NAT
+  on $ -> reduce E -> NAT
+State 9:
+  on ID -> shift 7
+  on NAT -> shift 8
+  on ( -> shift 9
+State 10:
+  on ; -> reduce S -> ID := E
+  on + -> shift 15
+  on $ -> reduce S -> ID := E
+State 11:
+  on , -> reduce L -> E
+  on ) -> reduce L -> E
+  on + -> shift 15
+State 12:
+  on , -> shift 16
+  on ) -> shift 17
+State 13:
+  on ; -> shift 6
+  on $ -> reduce S -> S ; S
+State 14:
+  on ) -> shift 18
+  on + -> shift 15
+State 15:
+  on ID -> shift 7
+  on NAT -> shift 8
+  on ( -> shift 9
+State 16:
+  on ID -> shift 7
+  on NAT -> shift 8
+  on ( -> shift 9
+State 17:
+  on ; -> reduce S -> PRINT ( L )
+  on $ -> reduce S -> PRINT ( L )
+State 18:
+  on , -> reduce E -> ( E )
+  on ; -> reduce E -> ( E )
+  on ) -> reduce E -> ( E )
+  on + -> reduce E -> ( E )
+  on $ -> reduce E -> ( E )
+State 19:
+  on , -> reduce E -> E + E
+  on ; -> reduce E -> E + E
+  on ) -> reduce E -> E + E
+  on + -> shift 15
+  on $ -> reduce E -> E + E
+State 20:
+  on , -> reduce L -> L , E
+  on ) -> reduce L -> L , E
+  on + -> shift 15
+Parse simulation:
+  Step 0: shift ID, goto state 1
+  Step 1: shift :=, goto state 4
+  Step 2: shift ID, goto state 7
+  Step 3: reduce E -> ID
+  Step 4: shift +, goto state 15
+  Step 5: shift NAT, goto state 8
+  Step 6: reduce E -> NAT
+  Step 7: reduce E -> E + E
+  Step 8: reduce S -> ID := E
+  Step 9: shift ;, goto state 6
+  Step 10: shift PRINT, goto state 2
+  Step 11: shift (, goto state 5
+  Step 12: shift ID, goto state 7
+  Step 13: reduce E -> ID
+  Step 14: reduce L -> E
+  Step 15: shift ,, goto state 16
+  Step 16: shift ID, goto state 7
+  Step 17: reduce E -> ID
+  Step 18: reduce L -> L , E
+  Step 19: shift ), goto state 17
+  Step 20: reduce S -> PRINT ( L )
+  Step 21: reduce S -> S ; S
+  Step 22: accept

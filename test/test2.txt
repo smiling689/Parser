@@ -1,0 +1,20 @@
+5 4 7
+ID
++
+*
+(
+)
+START
+E
+F
+G
+START
+START 1 E
+E 1 F
+E 3 E + F
+F 1 G
+F 3 F * G
+G 3 ( E )
+G 1 ID
+7
+ID * ( ID + ID )
