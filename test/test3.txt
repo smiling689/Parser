@@ -1,0 +1,14 @@
+5 1 4
+ID
++
+*
+(
+)
+E
+E
+E 1 ID
+E 3 E + E
+E 3 E * E
+E 3 ( E )
+7
+ID * ( ID + ID )
