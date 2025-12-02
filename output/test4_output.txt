@@ -1,0 +1,65 @@
+--- SLR(1) Parser Generator ---
+请输入上下文无关语法 (CFG) 和待分析序列。
+输入格式:
+1. <终结符数量T> <非终结符数量N> <产生式数量P>
+2. T行: 每行一个终结符名称 (例如: ID, PLUS, ...)
+3. N行: 每行一个非终结符名称 (例如: E, T, F, ...)
+4. 1行: 原始开始符号名称 (必须在 N 中定义过, 例如: E)
+5. P行: 每行描述一个产生式:
+   <左侧符号LHS> <右侧符号数量K> [K个右侧符号RHS ...]
+   例如: E 3 E PLUS T
+   例如: F 1 ID
+6. <待分析序列长度K>
+7. K行: 每行一个待分析的终结符 (来自 T)
+---------------------------------
+请输入:
+First sets:
+  S: {A_TOKEN, B_TOKEN}
+  A: {A_TOKEN, B_TOKEN}
+  S_aug: {A_TOKEN, B_TOKEN}
+Follow sets:
+  S: {$}
+  A: {$}
+  S_aug: {$}
+States (6):
+State 0:
+  S -> . A
+  A -> . A_TOKEN A
+  A -> . B_TOKEN
+  S_aug -> . S
+State 1:
+  A -> . A_TOKEN A
+  A -> A_TOKEN . A
+  A -> . B_TOKEN
+State 2:
+  A -> B_TOKEN .
+State 3:
+  S_aug -> S .
+State 4:
+  S -> A .
+State 5:
+  A -> A_TOKEN A .
+Parse table (shift/reduce entries shown for terminals):
+State 0:
+  on A_TOKEN -> shift 1
+  on B_TOKEN -> shift 2
+State 1:
+  on A_TOKEN -> shift 1
+  on B_TOKEN -> shift 2
+State 2:
+  on $ -> reduce A -> B_TOKEN
+State 3:
+  on $ -> reduce S_aug -> S
+State 4:
+  on $ -> reduce S -> A
+State 5:
+  on $ -> reduce A -> A_TOKEN A
+Parse simulation:
+  Step 0: shift A_TOKEN, goto state 1
+  Step 1: shift A_TOKEN, goto state 1
+  Step 2: shift B_TOKEN, goto state 2
+  Step 3: reduce A -> B_TOKEN
+  Step 4: reduce A -> A_TOKEN A
+  Step 5: reduce A -> A_TOKEN A
+  Step 6: reduce S -> A
+  Step 7: accept

@@ -1,0 +1,35 @@
+12 6 13
+ID
+NUM
+ASSIGN
+PLUS
+MUL
+LPAREN
+RPAREN
+SEMI
+PRINT
+IF
+THEN
+ELSE
+Program
+StmtList
+Stmt
+Expr
+Term
+Factor
+Program
+Program 1 StmtList
+StmtList 3 StmtList SEMI Stmt
+StmtList 1 Stmt
+Stmt 3 ID ASSIGN Expr
+Stmt 4 PRINT LPAREN Expr RPAREN
+Stmt 6 IF Expr THEN Stmt ELSE Stmt
+Expr 3 Expr PLUS Term
+Expr 1 Term
+Term 3 Term MUL Factor
+Term 1 Factor
+Factor 1 ID
+Factor 1 NUM
+Factor 3 LPAREN Expr RPAREN
+19
+ID ASSIGN ID PLUS NUM SEMI IF ID THEN PRINT LPAREN ID RPAREN ELSE ID ASSIGN ID MUL ID
