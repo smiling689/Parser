@@ -1,331 +1,59 @@
---- SLR(1) Parser Generator ---
-请输入上下文无关语法 (CFG) 和待分析序列。
+是否显示调试信息 (FIRST/FOLLOW/表)? (y/n): 请输入上下文无关语法 (CFG) 和待分析序列。
 输入格式:
 1. <终结符数量T> <非终结符数量N> <产生式数量P>
 2. T行: 每行一个终结符名称 (例如: ID, PLUS, ...)
 3. N行: 每行一个非终结符名称 (例如: E, T, F, ...)
-4. 1行: 原始开始符号名称 (必须在 N 中定义过, 例如: E)
-5. P行: 每行描述一个产生式:
-   <左侧符号LHS> <右侧符号数量K> [K个右侧符号RHS ...]
-   例如: E 3 E PLUS T
-   例如: F 1 ID
+4. 1行: 原始开始符号名称
+5. P行: 每行描述一个产生式 (格式: LHS -> RHS1 RHS2 ...):
+   例如: E -> E PLUS T
+   例如: F -> ID
 6. <待分析序列长度K>
-7. K行: 每行一个待分析的终结符 (来自 T)
+7. 待分析的终结符序列，终结符请用换行或空格隔开
 ---------------------------------
-请输入:
-First sets:
-  Program: {ID, PRINT, IF}
-  StmtList: {ID, PRINT, IF}
-  Stmt: {ID, PRINT, IF}
-  Expr: {ID, NUM, LPAREN}
-  Term: {ID, NUM, LPAREN}
-  Factor: {ID, NUM, LPAREN}
-  Program_aug: {ID, PRINT, IF}
-Follow sets:
-  Program: {$}
-  StmtList: {SEMI, $}
-  Stmt: {SEMI, ELSE, $}
-  Expr: {PLUS, RPAREN, SEMI, THEN, ELSE, $}
-  Term: {PLUS, MUL, RPAREN, SEMI, THEN, ELSE, $}
-  Factor: {PLUS, MUL, RPAREN, SEMI, THEN, ELSE, $}
-  Program_aug: {$}
-States (30):
-State 0:
-  Program -> . StmtList
-  StmtList -> . StmtList SEMI Stmt
-  StmtList -> . Stmt
-  Stmt -> . ID ASSIGN Expr
-  Stmt -> . PRINT LPAREN Expr RPAREN
-  Stmt -> . IF Expr THEN Stmt ELSE Stmt
-  Program_aug -> . Program
-State 1:
-  Stmt -> ID . ASSIGN Expr
-State 2:
-  Stmt -> PRINT . LPAREN Expr RPAREN
-State 3:
-  Stmt -> IF . Expr THEN Stmt ELSE Stmt
-  Expr -> . Expr PLUS Term
-  Expr -> . Term
-  Term -> . Term MUL Factor
-  Term -> . Factor
-  Factor -> . ID
-  Factor -> . NUM
-  Factor -> . LPAREN Expr RPAREN
-State 4:
-  Program_aug -> Program .
-State 5:
-  Program -> StmtList .
-  StmtList -> StmtList . SEMI Stmt
-State 6:
-  StmtList -> Stmt .
-State 7:
-  Stmt -> ID ASSIGN . Expr
-  Expr -> . Expr PLUS Term
-  Expr -> . Term
-  Term -> . Term MUL Factor
-  Term -> . Factor
-  Factor -> . ID
-  Factor -> . NUM
-  Factor -> . LPAREN Expr RPAREN
-State 8:
-  Stmt -> PRINT LPAREN . Expr RPAREN
-  Expr -> . Expr PLUS Term
-  Expr -> . Term
-  Term -> . Term MUL Factor
-  Term -> . Factor
-  Factor -> . ID
-  Factor -> . NUM
-  Factor -> . LPAREN Expr RPAREN
-State 9:
-  Factor -> ID .
-State 10:
-  Factor -> NUM .
-State 11:
-  Expr -> . Expr PLUS Term
-  Expr -> . Term
-  Term -> . Term MUL Factor
-  Term -> . Factor
-  Factor -> . ID
-  Factor -> . NUM
-  Factor -> . LPAREN Expr RPAREN
-  Factor -> LPAREN . Expr RPAREN
-State 12:
-  Stmt -> IF Expr . THEN Stmt ELSE Stmt
-  Expr -> Expr . PLUS Term
-State 13:
-  Expr -> Term .
-  Term -> Term . MUL Factor
-State 14:
-  Term -> Factor .
-State 15:
-  StmtList -> StmtList SEMI . Stmt
-  Stmt -> . ID ASSIGN Expr
-  Stmt -> . PRINT LPAREN Expr RPAREN
-  Stmt -> . IF Expr THEN Stmt ELSE Stmt
-State 16:
-  Stmt -> ID ASSIGN Expr .
-  Expr -> Expr . PLUS Term
-State 17:
-  Stmt -> PRINT LPAREN Expr . RPAREN
-  Expr -> Expr . PLUS Term
-State 18:
-  Expr -> Expr . PLUS Term
-  Factor -> LPAREN Expr . RPAREN
-State 19:
-  Expr -> Expr PLUS . Term
-  Term -> . Term MUL Factor
-  Term -> . Factor
-  Factor -> . ID
-  Factor -> . NUM
-  Factor -> . LPAREN Expr RPAREN
-State 20:
-  Stmt -> . ID ASSIGN Expr
-  Stmt -> . PRINT LPAREN Expr RPAREN
-  Stmt -> . IF Expr THEN Stmt ELSE Stmt
-  Stmt -> IF Expr THEN . Stmt ELSE Stmt
-State 21:
-  Term -> Term MUL . Factor
-  Factor -> . ID
-  Factor -> . NUM
-  Factor -> . LPAREN Expr RPAREN
-State 22:
-  StmtList -> StmtList SEMI Stmt .
-State 23:
-  Stmt -> PRINT LPAREN Expr RPAREN .
-State 24:
-  Factor -> LPAREN Expr RPAREN .
-State 25:
-  Expr -> Expr PLUS Term .
-  Term -> Term . MUL Factor
-State 26:
-  Stmt -> IF Expr THEN Stmt . ELSE Stmt
-State 27:
-  Term -> Term MUL Factor .
-State 28:
-  Stmt -> . ID ASSIGN Expr
-  Stmt -> . PRINT LPAREN Expr RPAREN
-  Stmt -> . IF Expr THEN Stmt ELSE Stmt
-  Stmt -> IF Expr THEN Stmt ELSE . Stmt
-State 29:
-  Stmt -> IF Expr THEN Stmt ELSE Stmt .
-Parse table (shift/reduce entries shown for terminals):
-State 0:
-  on ID -> shift 1
-  on PRINT -> shift 2
-  on IF -> shift 3
-State 1:
-  on ASSIGN -> shift 7
-State 2:
-  on LPAREN -> shift 8
-State 3:
-  on ID -> shift 9
-  on NUM -> shift 10
-  on LPAREN -> shift 11
-State 4:
-  on $ -> reduce Program_aug -> Program
-State 5:
-  on SEMI -> shift 15
-  on $ -> reduce Program -> StmtList
-State 6:
-  on SEMI -> reduce StmtList -> Stmt
-  on $ -> reduce StmtList -> Stmt
-State 7:
-  on ID -> shift 9
-  on NUM -> shift 10
-  on LPAREN -> shift 11
-State 8:
-  on ID -> shift 9
-  on NUM -> shift 10
-  on LPAREN -> shift 11
-State 9:
-  on PLUS -> reduce Factor -> ID
-  on MUL -> reduce Factor -> ID
-  on RPAREN -> reduce Factor -> ID
-  on SEMI -> reduce Factor -> ID
-  on THEN -> reduce Factor -> ID
-  on ELSE -> reduce Factor -> ID
-  on $ -> reduce Factor -> ID
-State 10:
-  on PLUS -> reduce Factor -> NUM
-  on MUL -> reduce Factor -> NUM
-  on RPAREN -> reduce Factor -> NUM
-  on SEMI -> reduce Factor -> NUM
-  on THEN -> reduce Factor -> NUM
-  on ELSE -> reduce Factor -> NUM
-  on $ -> reduce Factor -> NUM
-State 11:
-  on ID -> shift 9
-  on NUM -> shift 10
-  on LPAREN -> shift 11
-State 12:
-  on PLUS -> shift 19
-  on THEN -> shift 20
-State 13:
-  on PLUS -> reduce Expr -> Term
-  on MUL -> shift 21
-  on RPAREN -> reduce Expr -> Term
-  on SEMI -> reduce Expr -> Term
-  on THEN -> reduce Expr -> Term
-  on ELSE -> reduce Expr -> Term
-  on $ -> reduce Expr -> Term
-State 14:
-  on PLUS -> reduce Term -> Factor
-  on MUL -> reduce Term -> Factor
-  on RPAREN -> reduce Term -> Factor
-  on SEMI -> reduce Term -> Factor
-  on THEN -> reduce Term -> Factor
-  on ELSE -> reduce Term -> Factor
-  on $ -> reduce Term -> Factor
-State 15:
-  on ID -> shift 1
-  on PRINT -> shift 2
-  on IF -> shift 3
-State 16:
-  on PLUS -> shift 19
-  on SEMI -> reduce Stmt -> ID ASSIGN Expr
-  on ELSE -> reduce Stmt -> ID ASSIGN Expr
-  on $ -> reduce Stmt -> ID ASSIGN Expr
-State 17:
-  on PLUS -> shift 19
-  on RPAREN -> shift 23
-State 18:
-  on PLUS -> shift 19
-  on RPAREN -> shift 24
-State 19:
-  on ID -> shift 9
-  on NUM -> shift 10
-  on LPAREN -> shift 11
-State 20:
-  on ID -> shift 1
-  on PRINT -> shift 2
-  on IF -> shift 3
-State 21:
-  on ID -> shift 9
-  on NUM -> shift 10
-  on LPAREN -> shift 11
-State 22:
-  on SEMI -> reduce StmtList -> StmtList SEMI Stmt
-  on $ -> reduce StmtList -> StmtList SEMI Stmt
-State 23:
-  on SEMI -> reduce Stmt -> PRINT LPAREN Expr RPAREN
-  on ELSE -> reduce Stmt -> PRINT LPAREN Expr RPAREN
-  on $ -> reduce Stmt -> PRINT LPAREN Expr RPAREN
-State 24:
-  on PLUS -> reduce Factor -> LPAREN Expr RPAREN
-  on MUL -> reduce Factor -> LPAREN Expr RPAREN
-  on RPAREN -> reduce Factor -> LPAREN Expr RPAREN
-  on SEMI -> reduce Factor -> LPAREN Expr RPAREN
-  on THEN -> reduce Factor -> LPAREN Expr RPAREN
-  on ELSE -> reduce Factor -> LPAREN Expr RPAREN
-  on $ -> reduce Factor -> LPAREN Expr RPAREN
-State 25:
-  on PLUS -> reduce Expr -> Expr PLUS Term
-  on MUL -> shift 21
-  on RPAREN -> reduce Expr -> Expr PLUS Term
-  on SEMI -> reduce Expr -> Expr PLUS Term
-  on THEN -> reduce Expr -> Expr PLUS Term
-  on ELSE -> reduce Expr -> Expr PLUS Term
-  on $ -> reduce Expr -> Expr PLUS Term
-State 26:
-  on ELSE -> shift 28
-State 27:
-  on PLUS -> reduce Term -> Term MUL Factor
-  on MUL -> reduce Term -> Term MUL Factor
-  on RPAREN -> reduce Term -> Term MUL Factor
-  on SEMI -> reduce Term -> Term MUL Factor
-  on THEN -> reduce Term -> Term MUL Factor
-  on ELSE -> reduce Term -> Term MUL Factor
-  on $ -> reduce Term -> Term MUL Factor
-State 28:
-  on ID -> shift 1
-  on PRINT -> shift 2
-  on IF -> shift 3
-State 29:
-  on SEMI -> reduce Stmt -> IF Expr THEN Stmt ELSE Stmt
-  on ELSE -> reduce Stmt -> IF Expr THEN Stmt ELSE Stmt
-  on $ -> reduce Stmt -> IF Expr THEN Stmt ELSE Stmt
-Parse simulation:
-  Step 0: shift ID, goto state 1
-  Step 1: shift ASSIGN, goto state 7
-  Step 2: shift ID, goto state 9
-  Step 3: reduce Factor -> ID
-  Step 4: reduce Term -> Factor
-  Step 5: reduce Expr -> Term
-  Step 6: shift PLUS, goto state 19
-  Step 7: shift NUM, goto state 10
-  Step 8: reduce Factor -> NUM
-  Step 9: reduce Term -> Factor
-  Step 10: reduce Expr -> Expr PLUS Term
-  Step 11: reduce Stmt -> ID ASSIGN Expr
-  Step 12: reduce StmtList -> Stmt
-  Step 13: shift SEMI, goto state 15
-  Step 14: shift IF, goto state 3
-  Step 15: shift ID, goto state 9
-  Step 16: reduce Factor -> ID
-  Step 17: reduce Term -> Factor
-  Step 18: reduce Expr -> Term
-  Step 19: shift THEN, goto state 20
-  Step 20: shift PRINT, goto state 2
-  Step 21: shift LPAREN, goto state 8
-  Step 22: shift ID, goto state 9
-  Step 23: reduce Factor -> ID
-  Step 24: reduce Term -> Factor
-  Step 25: reduce Expr -> Term
-  Step 26: shift RPAREN, goto state 23
-  Step 27: reduce Stmt -> PRINT LPAREN Expr RPAREN
-  Step 28: shift ELSE, goto state 28
-  Step 29: shift ID, goto state 1
-  Step 30: shift ASSIGN, goto state 7
-  Step 31: shift ID, goto state 9
-  Step 32: reduce Factor -> ID
-  Step 33: reduce Term -> Factor
-  Step 34: shift MUL, goto state 21
-  Step 35: shift ID, goto state 9
-  Step 36: reduce Factor -> ID
-  Step 37: reduce Term -> Term MUL Factor
-  Step 38: reduce Expr -> Term
-  Step 39: reduce Stmt -> ID ASSIGN Expr
-  Step 40: reduce Stmt -> IF Expr THEN Stmt ELSE Stmt
-  Step 41: reduce StmtList -> StmtList SEMI Stmt
-  Step 42: reduce Program -> StmtList
-  Step 43: accept
+
+=== 移入规约过程 (Shift/Reduce Process) ===
+| ID ASSIGN ID PLUS NUM SEMI IF ID THEN PRINT LPAREN ID RPAREN ELSE ID ASSIGN ID MUL ID 
+ID | ASSIGN ID PLUS NUM SEMI IF ID THEN PRINT LPAREN ID RPAREN ELSE ID ASSIGN ID MUL ID 
+ID ASSIGN | ID PLUS NUM SEMI IF ID THEN PRINT LPAREN ID RPAREN ELSE ID ASSIGN ID MUL ID 
+ID ASSIGN ID | PLUS NUM SEMI IF ID THEN PRINT LPAREN ID RPAREN ELSE ID ASSIGN ID MUL ID 
+ID ASSIGN Factor | PLUS NUM SEMI IF ID THEN PRINT LPAREN ID RPAREN ELSE ID ASSIGN ID MUL ID 
+ID ASSIGN Term | PLUS NUM SEMI IF ID THEN PRINT LPAREN ID RPAREN ELSE ID ASSIGN ID MUL ID 
+ID ASSIGN Expr | PLUS NUM SEMI IF ID THEN PRINT LPAREN ID RPAREN ELSE ID ASSIGN ID MUL ID 
+ID ASSIGN Expr PLUS | NUM SEMI IF ID THEN PRINT LPAREN ID RPAREN ELSE ID ASSIGN ID MUL ID 
+ID ASSIGN Expr PLUS NUM | SEMI IF ID THEN PRINT LPAREN ID RPAREN ELSE ID ASSIGN ID MUL ID 
+ID ASSIGN Expr PLUS Factor | SEMI IF ID THEN PRINT LPAREN ID RPAREN ELSE ID ASSIGN ID MUL ID 
+ID ASSIGN Expr PLUS Term | SEMI IF ID THEN PRINT LPAREN ID RPAREN ELSE ID ASSIGN ID MUL ID 
+ID ASSIGN Expr | SEMI IF ID THEN PRINT LPAREN ID RPAREN ELSE ID ASSIGN ID MUL ID 
+Stmt | SEMI IF ID THEN PRINT LPAREN ID RPAREN ELSE ID ASSIGN ID MUL ID 
+StmtList | SEMI IF ID THEN PRINT LPAREN ID RPAREN ELSE ID ASSIGN ID MUL ID 
+StmtList SEMI | IF ID THEN PRINT LPAREN ID RPAREN ELSE ID ASSIGN ID MUL ID 
+StmtList SEMI IF | ID THEN PRINT LPAREN ID RPAREN ELSE ID ASSIGN ID MUL ID 
+StmtList SEMI IF ID | THEN PRINT LPAREN ID RPAREN ELSE ID ASSIGN ID MUL ID 
+StmtList SEMI IF Factor | THEN PRINT LPAREN ID RPAREN ELSE ID ASSIGN ID MUL ID 
+StmtList SEMI IF Term | THEN PRINT LPAREN ID RPAREN ELSE ID ASSIGN ID MUL ID 
+StmtList SEMI IF Expr | THEN PRINT LPAREN ID RPAREN ELSE ID ASSIGN ID MUL ID 
+StmtList SEMI IF Expr THEN | PRINT LPAREN ID RPAREN ELSE ID ASSIGN ID MUL ID 
+StmtList SEMI IF Expr THEN PRINT | LPAREN ID RPAREN ELSE ID ASSIGN ID MUL ID 
+StmtList SEMI IF Expr THEN PRINT LPAREN | ID RPAREN ELSE ID ASSIGN ID MUL ID 
+StmtList SEMI IF Expr THEN PRINT LPAREN ID | RPAREN ELSE ID ASSIGN ID MUL ID 
+StmtList SEMI IF Expr THEN PRINT LPAREN Factor | RPAREN ELSE ID ASSIGN ID MUL ID 
+StmtList SEMI IF Expr THEN PRINT LPAREN Term | RPAREN ELSE ID ASSIGN ID MUL ID 
+StmtList SEMI IF Expr THEN PRINT LPAREN Expr | RPAREN ELSE ID ASSIGN ID MUL ID 
+StmtList SEMI IF Expr THEN PRINT LPAREN Expr RPAREN | ELSE ID ASSIGN ID MUL ID 
+StmtList SEMI IF Expr THEN Stmt | ELSE ID ASSIGN ID MUL ID 
+StmtList SEMI IF Expr THEN Stmt ELSE | ID ASSIGN ID MUL ID 
+StmtList SEMI IF Expr THEN Stmt ELSE ID | ASSIGN ID MUL ID 
+StmtList SEMI IF Expr THEN Stmt ELSE ID ASSIGN | ID MUL ID 
+StmtList SEMI IF Expr THEN Stmt ELSE ID ASSIGN ID | MUL ID 
+StmtList SEMI IF Expr THEN Stmt ELSE ID ASSIGN Factor | MUL ID 
+StmtList SEMI IF Expr THEN Stmt ELSE ID ASSIGN Term | MUL ID 
+StmtList SEMI IF Expr THEN Stmt ELSE ID ASSIGN Term MUL | ID 
+StmtList SEMI IF Expr THEN Stmt ELSE ID ASSIGN Term MUL ID | 
+StmtList SEMI IF Expr THEN Stmt ELSE ID ASSIGN Term MUL Factor | 
+StmtList SEMI IF Expr THEN Stmt ELSE ID ASSIGN Term | 
+StmtList SEMI IF Expr THEN Stmt ELSE ID ASSIGN Expr | 
+StmtList SEMI IF Expr THEN Stmt ELSE Stmt | 
+StmtList SEMI Stmt | 
+StmtList | 
+Program | 
+=== ACCEPT ===

@@ -1,16 +1,12 @@
+n
 4 3 5
-ID
-COMMA
-LPAREN
-RPAREN
+ID COMMA LPAREN RPAREN
+Call ArgList Expr
 Call
-ArgList
-Expr
-Call
-Call 4 ID LPAREN ArgList RPAREN
-ArgList 3 ArgList COMMA Expr
-ArgList 1 Expr
-Expr 1 ID
-Expr 1 Call
+Call -> ID LPAREN ArgList RPAREN
+ArgList -> ArgList COMMA Expr
+ArgList -> Expr
+Expr -> ID
+Expr -> Call
 9
 ID LPAREN ID COMMA ID LPAREN ID RPAREN RPAREN

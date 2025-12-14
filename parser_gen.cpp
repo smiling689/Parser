@@ -4,6 +4,7 @@
 #include <cctype>
 #include <cstdlib>
 #include <iostream>
+#include <sstream> // 新增: 用于解析行输入
 #include <map>
 #include <queue>
 #include <set>
@@ -20,6 +21,8 @@ struct prod grammar[MAX_NUMBER_OF_PROD]; /* 存储所有产生式的数组 */
 /* 输出: */
 struct state state_info[MAX_NUMBER_OF_STATE]; /* 存储所有状态的信息 (项集) */
 struct trans_result trans[MAX_NUMBER_OF_STATE][MAX_NUMBER_OF_SYMB]; /* 状态转移表 (分析表) */
+
+bool show_details = false; // 全局变量：控制是否打印调试表
 
 /**
  * @brief 重载 handler (项) 的小于操作符, 用于std::set 或 std::map。
@@ -65,9 +68,6 @@ int augmented_prod_id = -1; // 增广产生式 S' -> S 的 ID
 
 /**
  * @brief 将产生式转换为字符串, 用于调试输出。
- * @param prod_id 产生式 ID。
- * @param dot_pos "点" 的位置 (-1 表示不显示点)。
- * @return 格式化后的字符串。
  */
 std::string production_to_string(int prod_id, int dot_pos = -1) {
     if (prod_id < 0 || prod_id >= number_of_prod) {
@@ -89,7 +89,6 @@ std::string production_to_string(int prod_id, int dot_pos = -1) {
 
 /**
  * @brief 初始化状态转移表 (分析表), 将所有动作设为 ACTION_NONE。
- * @param state_count 状态总数。
  */
 void initialize_transitions(int state_count) {
     for (int i = 0; i < state_count; ++i) {
@@ -102,8 +101,6 @@ void initialize_transitions(int state_count) {
 
 /**
  * @brief 计算一个 LR(0) 项集的闭包 (closure)。
- * @param items 初始项集 (核)。
- * @return 包含所有闭包项的完整项集。
  */
 std::vector<handler> closure(const std::vector<handler> &items) {
     std::vector<handler> result;
@@ -150,9 +147,6 @@ std::vector<handler> closure(const std::vector<handler> &items) {
 
 /**
  * @brief 计算状态 state 经过符号 symbol 的 GOTO 集。
- * @param state 
- * @param symbol 
- * @return GOTO(state, symbol) 对应的项集 (已计算闭包)。
  */
 std::vector<handler> goto_set(const std::vector<handler> &state, int symbol) {
     std::vector<handler> moved;
@@ -245,9 +239,6 @@ void compute_follow_sets() {
 
 /**
  * @brief 确保一个项集 (状态) 存在于 canonical_states 中, 并返回其 ID。
- * @param items 项集。
- * @param state_id 
- * @return 状态 ID。
  */
 int ensure_state(const std::vector<handler> &items,
                  std::map<std::vector<handler>, int> &state_id) {
@@ -355,7 +346,6 @@ void populate_state_info() {
 
 /**
  * @brief 尝试在分析表 (trans) 中设置一个动作。
- * @return true 如果设置成功, false 如果发生冲突。
  */
 bool set_action(int state, int symbol, int type, int id) {
     trans_result &entry = trans[state][symbol];
@@ -477,60 +467,83 @@ void simulate_parse(const std::vector<int> &input_tokens) {
         std::cout << "No input sequence provided for simulation.\n";
         return;
     }
-    std::cout << "Parse simulation:\n";
-    std::vector<int> stack;
-    stack.push_back(0);
+    std::cout << "\n=== 移入规约过程 (Shift/Reduce Process) ===\n";
+    
+    // 栈存储 {state_id, symbol_id}
+    // symbol_id 为进入该状态所代表的符号，初始状态无符号用 -1
+    std::vector<std::pair<int, int>> stack;
+    stack.push_back({0, -1});
+    
     size_t position = 0;
-    int step = 0;
+
+    // 辅助lambda：打印当前行
+    auto print_current_step = [&]() {
+        // 打印栈内容（即左侧已解析部分）
+        for (size_t i = 1; i < stack.size(); ++i) { // 跳过初始状态
+            std::cout << symbol_names[stack[i].second] << " ";
+        }
+        // 打印分隔符
+        std::cout << "| ";
+        // 打印剩余输入（即右侧未解析部分）
+        for (size_t i = position; i < input_tokens.size(); ++i) {
+            if (input_tokens[i] == eof_symbol) continue; // 不打印末尾的 $
+            std::cout << symbol_names[input_tokens[i]] << " ";
+        }
+        std::cout << "\n";
+    };
 
     while (true) {
+        print_current_step();
+
         if (position >= input_tokens.size()) {
             std::cout << "  [error] Ran out of input symbols (missing $?).\n";
             return;
         }
-        int state = stack.back();
+        int state = stack.back().first;
         int lookahead = input_tokens[position];
         
         const trans_result &entry = trans[state][lookahead];
 
         if (entry.t == ACTION_SHIFT) {
-            std::cout << "  Step " << step++ << ": shift "
-                      << symbol_names[lookahead] << ", goto state " << entry.id
-                      << "\n";
-            stack.push_back(entry.id);
+            // 移入: 压栈 {新状态, 当前输入符号}
+            stack.push_back({entry.id, lookahead});
             ++position;
         } else if (entry.t == ACTION_REDUCE) {
             if (entry.id == augmented_prod_id && lookahead == eof_symbol) {
-                std::cout << "  Step " << step++ << ": accept\n";
+                std::cout << "=== ACCEPT ===\n";
                 break;
             }
 
             const prod &p = grammar[entry.id];
-            std::cout << "  Step " << step++ << ": reduce "
-                      << production_to_string(entry.id) << "\n";
             
+            // 规约: 弹出 RHS 长度个状态
             for (int i = 0; i < p.len; ++i) {
                 if (!stack.empty()) {
                     stack.pop_back();
                 }
             }
+            
             if (stack.empty()) {
-                std::cout
-                    << "  [error] State stack is empty during reduction.\n";
+                std::cout << "  [error] State stack is empty during reduction.\n";
                 return;
             }
 
-            int goto_state = goto_table[stack.back()][p.l];
+            // GOTO: 根据栈顶状态和 LHS 符号查找下一个状态
+            int top_state = stack.back().first;
+            int goto_state = goto_table[top_state][p.l];
+            
             if (goto_state == -1) {
                 std::cout << "  [error] Missing goto from state "
-                          << stack.back() << " on " << symbol_names[p.l]
+                          << top_state << " on " << symbol_names[p.l]
                           << "\n";
                 return;
             }
-            stack.push_back(goto_state);
+            
+            // 压入 {GOTO状态, LHS符号}
+            stack.push_back({goto_state, p.l});
+
         } else {
-            std::cout << "  [error] No valid action at state " << state
-                      << " on symbol " << symbol_names[lookahead] << "\n";
+            std::cout << "=== ERROR ===\n";
             return;
         }
     }
@@ -539,28 +552,29 @@ void simulate_parse(const std::vector<int> &input_tokens) {
 } // namespace
 
 int main() {
-    std::ios::sync_with_stdio(false);
-    std::cin.tie(nullptr);
+    // std::ios::sync_with_stdio(false);
+    // std::cin.tie(nullptr);
 
-    const bool debug_mode = std::getenv("PARSER_DEBUG") != nullptr;
+    // 交互询问是否显示调试信息
+    std::cout << "是否显示调试信息 (FIRST/FOLLOW/表)? (y/n): ";
+    char show_choice;
+    std::cin >> show_choice;
+    if (show_choice == 'y' || show_choice == 'Y') {
+        show_details = true;
+    }
 
-    std::cout << "--- SLR(1) Parser Generator ---\n";
     std::cout << "请输入上下文无关语法 (CFG) 和待分析序列。\n";
     std::cout << "输入格式:\n";
     std::cout << "1. <终结符数量T> <非终结符数量N> <产生式数量P>\n";
     std::cout << "2. T行: 每行一个终结符名称 (例如: ID, PLUS, ...)\n";
     std::cout << "3. N行: 每行一个非终结符名称 (例如: E, T, F, ...)\n";
-    std::cout
-        << "4. 1行: 原始开始符号名称 (必须在 N 中定义过, 例如: E)\n";
-    std::cout << "5. P行: 每行描述一个产生式:\n";
-    std::cout
-        << "   <左侧符号LHS> <右侧符号数量K> [K个右侧符号RHS ...]\n";
-    std::cout << "   例如: E 3 E PLUS T\n";
-    std::cout << "   例如: F 1 ID\n";
+    std::cout << "4. 1行: 原始开始符号名称\n";
+    std::cout << "5. P行: 每行描述一个产生式 (格式: LHS -> RHS1 RHS2 ...):\n";
+    std::cout << "   例如: E -> E PLUS T\n";
+    std::cout << "   例如: F -> ID\n";
     std::cout << "6. <待分析序列长度K>\n";
-    std::cout << "7. K行: 每行一个待分析的终结符 (来自 T)\n";
+    std::cout << "7. 待分析的终结符序列，终结符请用换行或空格隔开\n";
     std::cout << "---------------------------------\n";
-    std::cout << "请输入:\n";
 
     int terminal_count = 0;
     int non_terminal_count = 0;
@@ -576,7 +590,6 @@ int main() {
     is_terminal.reserve(terminal_count + non_terminal_count + 2);
 
     std::unordered_map<std::string, int> symbol_id;
-    symbol_id.reserve(terminal_count + non_terminal_count + 2);
 
     for (int i = 0; i < terminal_count; ++i) {
         std::string name;
@@ -603,39 +616,47 @@ int main() {
     }
     int original_start_symbol = symbol_id[start_symbol_name];
 
+    // 消耗换行符，以便后续 getline 正常工作
+    std::string dummy_line;
+    std::getline(std::cin, dummy_line);
+
     for (int i = 0; i < prod_count; ++i) {
-        std::string lhs;
-        int len = 0;
-        if (!(std::cin >> lhs >> len)) {
-            std::cerr << "错误: 无法读取产生式 " << i << " (LHS len)。\n";
+        std::string line;
+        if (!std::getline(std::cin, line)) {
+            std::cerr << "错误: 无法读取产生式 " << i << "。\n";
             return 1;
         }
+
+        std::stringstream ss(line);
+        std::string lhs, arrow, rhs_sym;
+        
+        // 读取 LHS 和 "->"
+        if (!(ss >> lhs >> arrow)) {
+             std::cerr << "错误: 产生式 " << i << " 格式错误 (期望: LHS -> ...)。\n";
+             return 1;
+        }
+
         if (!symbol_id.count(lhs)) {
             std::cerr << "错误: 未知符号: " << lhs << "\n";
             return 1;
         }
-        if (debug_mode) {
-            std::cerr << "[debug] production " << i << ": " << lhs << " length "
-                      << len << "\n";
-        }
+        
         grammar[i].l = symbol_id[lhs];
-        grammar[i].len = len;
-        grammar[i].r = new int[len];
-        for (int j = 0; j < len; ++j) {
-            std::string sym;
-            if (!(std::cin >> sym)) {
-                std::cerr << "错误: 无法读取产生式 " << i << " 的第 " << j
-                          << " 个 RHS 符号。\n";
+        
+        // 解析右侧符号
+        std::vector<int> rhs_indices;
+        while (ss >> rhs_sym) {
+            if (!symbol_id.count(rhs_sym)) {
+                std::cerr << "错误: 未知符号: " << rhs_sym << "\n";
                 return 1;
             }
-            if (!symbol_id.count(sym)) {
-                std::cerr << "错误: 未知符号: " << sym << "\n";
-                return 1;
-            }
-            grammar[i].r[j] = symbol_id[sym];
-            if (debug_mode) {
-                std::cerr << "    [debug] rhs " << j << ": " << sym << "\n";
-            }
+            rhs_indices.push_back(symbol_id[rhs_sym]);
+        }
+        
+        grammar[i].len = static_cast<int>(rhs_indices.size());
+        grammar[i].r = new int[grammar[i].len];
+        for (int k = 0; k < grammar[i].len; ++k) {
+            grammar[i].r[k] = rhs_indices[k];
         }
     }
 
@@ -663,6 +684,7 @@ int main() {
         input_sequence.push_back(id);
     }
 
+    // 后续构建逻辑保持不变
     int original_symbol_count = terminal_count + non_terminal_count;
 
     eof_symbol = original_symbol_count;
@@ -697,9 +719,11 @@ int main() {
     populate_state_info();
     build_parse_table();
 
-    dump_first_follow();
-    dump_states();
-    dump_transitions();
+    if (show_details) {
+        dump_first_follow();
+        dump_states();
+        dump_transitions();
+    }
 
     input_sequence.push_back(eof_symbol);
     simulate_parse(input_sequence);

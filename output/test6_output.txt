@@ -1,109 +1,33 @@
---- SLR(1) Parser Generator ---
-请输入上下文无关语法 (CFG) 和待分析序列。
+是否显示调试信息 (FIRST/FOLLOW/表)? (y/n): 请输入上下文无关语法 (CFG) 和待分析序列。
 输入格式:
 1. <终结符数量T> <非终结符数量N> <产生式数量P>
 2. T行: 每行一个终结符名称 (例如: ID, PLUS, ...)
 3. N行: 每行一个非终结符名称 (例如: E, T, F, ...)
-4. 1行: 原始开始符号名称 (必须在 N 中定义过, 例如: E)
-5. P行: 每行描述一个产生式:
-   <左侧符号LHS> <右侧符号数量K> [K个右侧符号RHS ...]
-   例如: E 3 E PLUS T
-   例如: F 1 ID
+4. 1行: 原始开始符号名称
+5. P行: 每行描述一个产生式 (格式: LHS -> RHS1 RHS2 ...):
+   例如: E -> E PLUS T
+   例如: F -> ID
 6. <待分析序列长度K>
-7. K行: 每行一个待分析的终结符 (来自 T)
+7. 待分析的终结符序列，终结符请用换行或空格隔开
 ---------------------------------
-请输入:
-First sets:
-  Call: {ID}
-  ArgList: {ID}
-  Expr: {ID}
-  Call_aug: {ID}
-Follow sets:
-  Call: {COMMA, RPAREN, $}
-  ArgList: {COMMA, RPAREN}
-  Expr: {COMMA, RPAREN}
-  Call_aug: {$}
-States (11):
-State 0:
-  Call -> . ID LPAREN ArgList RPAREN
-  Call_aug -> . Call
-State 1:
-  Call -> ID . LPAREN ArgList RPAREN
-State 2:
-  Call_aug -> Call .
-State 3:
-  Call -> . ID LPAREN ArgList RPAREN
-  Call -> ID LPAREN . ArgList RPAREN
-  ArgList -> . ArgList COMMA Expr
-  ArgList -> . Expr
-  Expr -> . ID
-  Expr -> . Call
-State 4:
-  Call -> ID . LPAREN ArgList RPAREN
-  Expr -> ID .
-State 5:
-  Expr -> Call .
-State 6:
-  Call -> ID LPAREN ArgList . RPAREN
-  ArgList -> ArgList . COMMA Expr
-State 7:
-  ArgList -> Expr .
-State 8:
-  Call -> . ID LPAREN ArgList RPAREN
-  ArgList -> ArgList COMMA . Expr
-  Expr -> . ID
-  Expr -> . Call
-State 9:
-  Call -> ID LPAREN ArgList RPAREN .
-State 10:
-  ArgList -> ArgList COMMA Expr .
-Parse table (shift/reduce entries shown for terminals):
-State 0:
-  on ID -> shift 1
-State 1:
-  on LPAREN -> shift 3
-State 2:
-  on $ -> reduce Call_aug -> Call
-State 3:
-  on ID -> shift 4
-State 4:
-  on COMMA -> reduce Expr -> ID
-  on LPAREN -> shift 3
-  on RPAREN -> reduce Expr -> ID
-State 5:
-  on COMMA -> reduce Expr -> Call
-  on RPAREN -> reduce Expr -> Call
-State 6:
-  on COMMA -> shift 8
-  on RPAREN -> shift 9
-State 7:
-  on COMMA -> reduce ArgList -> Expr
-  on RPAREN -> reduce ArgList -> Expr
-State 8:
-  on ID -> shift 4
-State 9:
-  on COMMA -> reduce Call -> ID LPAREN ArgList RPAREN
-  on RPAREN -> reduce Call -> ID LPAREN ArgList RPAREN
-  on $ -> reduce Call -> ID LPAREN ArgList RPAREN
-State 10:
-  on COMMA -> reduce ArgList -> ArgList COMMA Expr
-  on RPAREN -> reduce ArgList -> ArgList COMMA Expr
-Parse simulation:
-  Step 0: shift ID, goto state 1
-  Step 1: shift LPAREN, goto state 3
-  Step 2: shift ID, goto state 4
-  Step 3: reduce Expr -> ID
-  Step 4: reduce ArgList -> Expr
-  Step 5: shift COMMA, goto state 8
-  Step 6: shift ID, goto state 4
-  Step 7: shift LPAREN, goto state 3
-  Step 8: shift ID, goto state 4
-  Step 9: reduce Expr -> ID
-  Step 10: reduce ArgList -> Expr
-  Step 11: shift RPAREN, goto state 9
-  Step 12: reduce Call -> ID LPAREN ArgList RPAREN
-  Step 13: reduce Expr -> Call
-  Step 14: reduce ArgList -> ArgList COMMA Expr
-  Step 15: shift RPAREN, goto state 9
-  Step 16: reduce Call -> ID LPAREN ArgList RPAREN
-  Step 17: accept
+
+=== 移入规约过程 (Shift/Reduce Process) ===
+| ID LPAREN ID COMMA ID LPAREN ID RPAREN RPAREN 
+ID | LPAREN ID COMMA ID LPAREN ID RPAREN RPAREN 
+ID LPAREN | ID COMMA ID LPAREN ID RPAREN RPAREN 
+ID LPAREN ID | COMMA ID LPAREN ID RPAREN RPAREN 
+ID LPAREN Expr | COMMA ID LPAREN ID RPAREN RPAREN 
+ID LPAREN ArgList | COMMA ID LPAREN ID RPAREN RPAREN 
+ID LPAREN ArgList COMMA | ID LPAREN ID RPAREN RPAREN 
+ID LPAREN ArgList COMMA ID | LPAREN ID RPAREN RPAREN 
+ID LPAREN ArgList COMMA ID LPAREN | ID RPAREN RPAREN 
+ID LPAREN ArgList COMMA ID LPAREN ID | RPAREN RPAREN 
+ID LPAREN ArgList COMMA ID LPAREN Expr | RPAREN RPAREN 
+ID LPAREN ArgList COMMA ID LPAREN ArgList | RPAREN RPAREN 
+ID LPAREN ArgList COMMA ID LPAREN ArgList RPAREN | RPAREN 
+ID LPAREN ArgList COMMA Call | RPAREN 
+ID LPAREN ArgList COMMA Expr | RPAREN 
+ID LPAREN ArgList | RPAREN 
+ID LPAREN ArgList RPAREN | 
+Call | 
+=== ACCEPT ===

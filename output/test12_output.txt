@@ -1,0 +1,109 @@
+是否显示调试信息 (FIRST/FOLLOW/表)? (y/n): 请输入上下文无关语法 (CFG) 和待分析序列。
+输入格式:
+1. <终结符数量T> <非终结符数量N> <产生式数量P>
+2. T行: 每行一个终结符名称 (例如: ID, PLUS, ...)
+3. N行: 每行一个非终结符名称 (例如: E, T, F, ...)
+4. 1行: 原始开始符号名称
+5. P行: 每行描述一个产生式 (格式: LHS -> RHS1 RHS2 ...):
+   例如: E -> E PLUS T
+   例如: F -> ID
+6. <待分析序列长度K>
+7. 待分析的终结符序列，终结符请用换行或空格隔开
+---------------------------------
+First sets:
+  A: {Z}
+  B: {Z}
+  C: {Z}
+  A_aug: {Z}
+Follow sets:
+  A: {+, $}
+  B: {+, /, $}
+  C: {+, /, $}
+  A_aug: {$}
+States (9):
+State 0:
+  A -> . B
+  A -> . A + B
+  B -> . B / C
+  B -> . C
+  C -> . Z
+  A_aug -> . A
+State 1:
+  C -> Z .
+State 2:
+  A -> A . + B
+  A_aug -> A .
+State 3:
+  A -> B .
+  B -> B . / C
+State 4:
+  B -> C .
+State 5:
+  A -> A + . B
+  B -> . B / C
+  B -> . C
+  C -> . Z
+State 6:
+  B -> B / . C
+  C -> . Z
+State 7:
+  A -> A + B .
+  B -> B . / C
+State 8:
+  B -> B / C .
+Parse table (shift/reduce entries shown for terminals):
+State 0:
+  on Z -> shift 1
+State 1:
+  on + -> reduce C -> Z
+  on / -> reduce C -> Z
+  on $ -> reduce C -> Z
+State 2:
+  on + -> shift 5
+  on $ -> reduce A_aug -> A
+State 3:
+  on + -> reduce A -> B
+  on / -> shift 6
+  on $ -> reduce A -> B
+State 4:
+  on + -> reduce B -> C
+  on / -> reduce B -> C
+  on $ -> reduce B -> C
+State 5:
+  on Z -> shift 1
+State 6:
+  on Z -> shift 1
+State 7:
+  on + -> reduce A -> A + B
+  on / -> shift 6
+  on $ -> reduce A -> A + B
+State 8:
+  on + -> reduce B -> B / C
+  on / -> reduce B -> B / C
+  on $ -> reduce B -> B / C
+
+=== 移入规约过程 (Shift/Reduce Process) ===
+| Z / Z + Z + Z / Z 
+Z | / Z + Z + Z / Z 
+C | / Z + Z + Z / Z 
+B | / Z + Z + Z / Z 
+B / | Z + Z + Z / Z 
+B / Z | + Z + Z / Z 
+B / C | + Z + Z / Z 
+B | + Z + Z / Z 
+A | + Z + Z / Z 
+A + | Z + Z / Z 
+A + Z | + Z / Z 
+A + C | + Z / Z 
+A + B | + Z / Z 
+A | + Z / Z 
+A + | Z / Z 
+A + Z | / Z 
+A + C | / Z 
+A + B | / Z 
+A + B / | Z 
+A + B / Z | 
+A + B / C | 
+A + B | 
+A | 
+=== ACCEPT ===

@@ -1,0 +1,13 @@
+n
+5 3 6
+ID PLUS MUL LPAREN RPAREN
+E T F
+E
+E -> E PLUS T
+E -> T
+T -> T MUL F
+T -> F
+F -> LPAREN E RPAREN
+F -> ID
+5
+ID PLUS ID MUL ID

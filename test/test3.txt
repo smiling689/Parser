@@ -1,14 +1,11 @@
+n
 5 1 4
-ID
-+
-*
-(
-)
+ID + * ( )
 E
 E
-E 1 ID
-E 3 E + E
-E 3 E * E
-E 3 ( E )
+E -> ID
+E -> E + E
+E -> E * E
+E -> ( E )
 7
 ID * ( ID + ID )

@@ -1,122 +1,29 @@
---- SLR(1) Parser Generator ---
-请输入上下文无关语法 (CFG) 和待分析序列。
+是否显示调试信息 (FIRST/FOLLOW/表)? (y/n): 请输入上下文无关语法 (CFG) 和待分析序列。
 输入格式:
 1. <终结符数量T> <非终结符数量N> <产生式数量P>
 2. T行: 每行一个终结符名称 (例如: ID, PLUS, ...)
 3. N行: 每行一个非终结符名称 (例如: E, T, F, ...)
-4. 1行: 原始开始符号名称 (必须在 N 中定义过, 例如: E)
-5. P行: 每行描述一个产生式:
-   <左侧符号LHS> <右侧符号数量K> [K个右侧符号RHS ...]
-   例如: E 3 E PLUS T
-   例如: F 1 ID
+4. 1行: 原始开始符号名称
+5. P行: 每行描述一个产生式 (格式: LHS -> RHS1 RHS2 ...):
+   例如: E -> E PLUS T
+   例如: F -> ID
 6. <待分析序列长度K>
-7. K行: 每行一个待分析的终结符 (来自 T)
+7. 待分析的终结符序列，终结符请用换行或空格隔开
 ---------------------------------
-请输入:
-First sets:
-  E: {ID, (}
-  E_aug: {ID, (}
-Follow sets:
-  E: {+, *, ), $}
-  E_aug: {$}
-States (10):
-State 0:
-  E -> . ID
-  E -> . E + E
-  E -> . E * E
-  E -> . ( E )
-  E_aug -> . E
-State 1:
-  E -> ID .
-State 2:
-  E -> . ID
-  E -> . E + E
-  E -> . E * E
-  E -> . ( E )
-  E -> ( . E )
-State 3:
-  E -> E . + E
-  E -> E . * E
-  E_aug -> E .
-State 4:
-  E -> E . + E
-  E -> E . * E
-  E -> ( E . )
-State 5:
-  E -> . ID
-  E -> . E + E
-  E -> E + . E
-  E -> . E * E
-  E -> . ( E )
-State 6:
-  E -> . ID
-  E -> . E + E
-  E -> . E * E
-  E -> E * . E
-  E -> . ( E )
-State 7:
-  E -> ( E ) .
-State 8:
-  E -> E . + E
-  E -> E + E .
-  E -> E . * E
-State 9:
-  E -> E . + E
-  E -> E . * E
-  E -> E * E .
-Parse table (shift/reduce entries shown for terminals):
-State 0:
-  on ID -> shift 1
-  on ( -> shift 2
-State 1:
-  on + -> reduce E -> ID
-  on * -> reduce E -> ID
-  on ) -> reduce E -> ID
-  on $ -> reduce E -> ID
-State 2:
-  on ID -> shift 1
-  on ( -> shift 2
-State 3:
-  on + -> shift 5
-  on * -> shift 6
-  on $ -> reduce E_aug -> E
-State 4:
-  on + -> shift 5
-  on * -> shift 6
-  on ) -> shift 7
-State 5:
-  on ID -> shift 1
-  on ( -> shift 2
-State 6:
-  on ID -> shift 1
-  on ( -> shift 2
-State 7:
-  on + -> reduce E -> ( E )
-  on * -> reduce E -> ( E )
-  on ) -> reduce E -> ( E )
-  on $ -> reduce E -> ( E )
-State 8:
-  on + -> shift 5
-  on * -> reduce E -> E + E
-  on ) -> reduce E -> E + E
-  on $ -> reduce E -> E + E
-State 9:
-  on + -> shift 5
-  on * -> shift 6
-  on ) -> reduce E -> E * E
-  on $ -> reduce E -> E * E
-Parse simulation:
-  Step 0: shift ID, goto state 1
-  Step 1: reduce E -> ID
-  Step 2: shift *, goto state 6
-  Step 3: shift (, goto state 2
-  Step 4: shift ID, goto state 1
-  Step 5: reduce E -> ID
-  Step 6: shift +, goto state 5
-  Step 7: shift ID, goto state 1
-  Step 8: reduce E -> ID
-  Step 9: reduce E -> E + E
-  Step 10: shift ), goto state 7
-  Step 11: reduce E -> ( E )
-  Step 12: reduce E -> E * E
-  Step 13: accept
+
+=== 移入规约过程 (Shift/Reduce Process) ===
+| ID * ( ID + ID ) 
+ID | * ( ID + ID ) 
+E | * ( ID + ID ) 
+E * | ( ID + ID ) 
+E * ( | ID + ID ) 
+E * ( ID | + ID ) 
+E * ( E | + ID ) 
+E * ( E + | ID ) 
+E * ( E + ID | ) 
+E * ( E + E | ) 
+E * ( E | ) 
+E * ( E ) | 
+E * E | 
+E | 
+=== ACCEPT ===

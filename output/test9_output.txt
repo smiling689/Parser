@@ -12,27 +12,23 @@
 ---------------------------------
 
 === 移入规约过程 (Shift/Reduce Process) ===
-| ID := ID + NAT ; PRINT ( ID , ID ) 
-ID | := ID + NAT ; PRINT ( ID , ID ) 
-ID := | ID + NAT ; PRINT ( ID , ID ) 
-ID := ID | + NAT ; PRINT ( ID , ID ) 
-ID := E | + NAT ; PRINT ( ID , ID ) 
-ID := E + | NAT ; PRINT ( ID , ID ) 
-ID := E + NAT | ; PRINT ( ID , ID ) 
-ID := E + E | ; PRINT ( ID , ID ) 
-ID := E | ; PRINT ( ID , ID ) 
-S | ; PRINT ( ID , ID ) 
-S ; | PRINT ( ID , ID ) 
-S ; PRINT | ( ID , ID ) 
-S ; PRINT ( | ID , ID ) 
-S ; PRINT ( ID | , ID ) 
-S ; PRINT ( E | , ID ) 
-S ; PRINT ( L | , ID ) 
-S ; PRINT ( L , | ID ) 
-S ; PRINT ( L , ID | ) 
-S ; PRINT ( L , E | ) 
-S ; PRINT ( L | ) 
-S ; PRINT ( L ) | 
-S ; S | 
-S | 
+| D * ( D + D ) 
+D | * ( D + D ) 
+C | * ( D + D ) 
+B | * ( D + D ) 
+B * | ( D + D ) 
+B * ( | D + D ) 
+B * ( D | + D ) 
+B * ( C | + D ) 
+B * ( B | + D ) 
+B * ( A | + D ) 
+B * ( A + | D ) 
+B * ( A + D | ) 
+B * ( A + C | ) 
+B * ( A + B | ) 
+B * ( A | ) 
+B * ( A ) | 
+B * C | 
+B | 
+A | 
 === ACCEPT ===

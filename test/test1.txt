@@ -1,25 +1,16 @@
+n
 9 3 9
-ID
-NAT
-,
-;
-(
-)
-+
-:=
-PRINT
+ID NAT , ; ( ) + := PRINT
+S E L
 S
-E
-L
-S
-S 3 S ; S
-S 3 ID := E
-S 4 PRINT ( L )
-E 1 ID
-E 1 NAT
-E 3 E + E
-E 3 ( E )
-L 1 E
-L 3 L , E
+S -> S ; S
+S -> ID := E
+S -> PRINT ( L )
+E -> ID
+E -> NAT
+E -> E + E
+E -> ( E )
+L -> E
+L -> L , E
 12
 ID := ID + NAT ; PRINT ( ID , ID )
